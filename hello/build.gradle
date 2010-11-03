@@ -1,0 +1,44 @@
+apply plugin: HiPlugin
+
+printText = 'Welcome to JFall 2010!'
+
+task goodMorning << {
+    println "Good morning all!"
+    println printText
+}
+
+task antGoodMorning << {
+    ant.echo message: 'Hello JFall 2010 from ANT'
+}
+
+task hello(type: HelloTask)
+
+task helloJFall(type: HelloTask) {
+    text = 'Hello JFall 2010'
+}
+
+hiPluginText = 'Hello, and welcome to JFall 2010'
+
+defaultTasks 'goodMorning', 'antGoodMorning', 'hello', 'helloJFall', 'hi'
+
+class HelloTask extends DefaultTask {
+    String text = 'default text'
+
+    @TaskAction
+    void print() {
+        println text
+    }
+}
+
+class HiPlugin implements Plugin<Project> {
+    void apply(Project project) {
+        project.convention.plugins.hi = new HiPluginConvention()
+        project.task('hi') << {
+            println project.convention.plugins.hi.hiPluginText
+        }
+    }
+}
+
+class HiPluginConvention {
+    String hiPluginText = 'Hi, and welcome to JFall 2010'
+}

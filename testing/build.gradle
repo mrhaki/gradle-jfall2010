@@ -1,0 +1,33 @@
+import org.apache.tools.ant.filters.*
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.8.2'
+}
+
+test {
+    maxParallelForks = 4
+    forkEvery = 15
+}
+
+packages = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+classNames = ['First', 'Second', 'Third', 'Four', 'Five', 'Six']
+
+task createTests << {
+    packages.each { packageName ->
+        classNames.each { className ->
+            copy {
+                from 'src/templates'
+                into 'src/test/java'
+                filter(ReplaceTokens, tokens: [class: className, package: packageName])
+                rename '(.*).java', packageName + '/' + className + '.java'
+            }
+        }
+    }
+}
+

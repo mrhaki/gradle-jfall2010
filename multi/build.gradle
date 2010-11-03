@@ -1,0 +1,37 @@
+subprojects {
+  apply plugin: 'java'
+  version = 'DEMO'
+  group = 'com.mrhaki'
+
+  repositories { mavenCentral() }
+}
+
+project(':api') {
+  dependencies {
+    compile project(':shared')
+  }
+
+  configurations {
+    spi
+  }
+
+  task spiJar(type: Jar) {
+    dependsOn classes
+    baseName = 'api-spi'
+    from sourceSets.main.classes
+    include 'com/mrhaki/api/*'
+  }
+
+  artifacts {
+    spi spiJar
+  }
+
+}
+
+project(":person-service") {
+  dependencies {
+    compile project(':shared')
+    compile project(path: ':api', configuration: 'spi')
+    testCompile 'junit:junit:4.8.2', project(':api')
+  }
+}

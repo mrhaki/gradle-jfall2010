@@ -1,0 +1,55 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+version = 'DEMO'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.5'
+    testCompile 'junit:junit:4.8.2'
+}
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ['test/java']
+        }
+    }
+}
+
+jar {
+  manifest {
+    attributes 'Version' : version, 'Built-by' : 'mrhaki'
+  }
+}
+jar.manifest.writeTo "$buildDir/jar-manifest.mf"
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.java
+}
+sourceJar.doLast { println "Done with SOURCE JAR" }
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':releaseProject')) {
+        project.version = 'FINAL'
+    }
+}
+
+task releaseProject(dependsOn: 'build') << {
+    println "Releasing"
+    println version
+}
+
+tasks.addRule('Pattern: ping<ID>: Ping server with id') { taskname ->
+    if (taskname.startsWith('ping')) {
+        task(taskname) << {
+            println "Ping server [${taskname - 'ping'}]"
+        }
+    }
+}
+
